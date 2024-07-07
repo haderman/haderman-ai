@@ -5,14 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"rsc.io/quote/v4"
 )
 
 func main() {
-	fmt.Println(quote.Go())
-
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
+	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbums)
 
 	router.Run("0.0.0.0:8080")
@@ -36,6 +34,20 @@ var albums = []album{
 // getAlbums responds with the list of all albums as JSON.
 func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
+}
+
+// getAlbumByID responds with the album with the given ID as JSON.
+
+func getAlbumByID(c *gin.Context) {
+	id := c.Param("id")
+
+	for _, a := range albums {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"error": "album not found"})
 }
 
 // postAlbums adds an album from JSON received in the request body.
