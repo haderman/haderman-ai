@@ -9,9 +9,13 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.GET("/albums", getAlbums)
-	router.GET("/albums/:id", getAlbumByID)
-	router.POST("/albums", postAlbums)
+
+	v1 := router.Group("/v1")
+	{
+		v1.GET("/albums", getAlbums)
+		v1.GET("/albums/:id", getAlbumByID)
+		v1.POST("/albums", postAlbums)
+	}
 
 	router.Run("0.0.0.0:8080")
 }
@@ -33,11 +37,11 @@ var albums = []album{
 
 // getAlbums responds with the list of all albums as JSON.
 func getAlbums(c *gin.Context) {
+	test()
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
 // getAlbumByID responds with the album with the given ID as JSON.
-
 func getAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -64,4 +68,12 @@ func postAlbums(c *gin.Context) {
 	// Add the new album to the slice.
 	albums = append(albums, newAlbum)
 	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+func test() {
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+
+	for _, v := range primes {
+		fmt.Println(v)
+	}
 }
