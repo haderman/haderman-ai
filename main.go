@@ -2,22 +2,52 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/brunotm/uulid"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
+const expectedHost string = "0.0.0.0:8080"
+
 func main() {
+	loadDotEnvVariables()
+
+	generateUULID()
+
 	router := gin.Default()
 
-	v1 := router.Group("/v1")
+	authMiddleware := AuthMiddleware()
+	router.Use((HandlerAuthMiddleWare(authMiddleware)))
+
+	// router.Use(secureHeaders)
+
+	// signedAccessToken, err := NewHadermanBackendServerAccessToken()
+	// if err != nil {
+	// 	log.Fatal("error creating access token")
+	// }
+
+	// println("token: ")
+	// println(signedAccessToken)
+
+	// parsedUserClaims := ParseAccessToken(signedAccessToken)
+	// print("claims: ")
+	// println(parsedUserClaims.First)
+
+	// --
+
+	router.POST("/login", authMiddleware.LoginHandler)
+
+	v1 := router.Group("/v1", authMiddleware.MiddlewareFunc())
 	{
 		v1.GET("/albums", getAlbums)
 		v1.GET("/albums/:id", getAlbumByID)
 		v1.POST("/albums", postAlbums)
 	}
 
-	router.Run("0.0.0.0:8080")
+	router.Run(expectedHost)
 }
 
 // album represents data about a record album.
@@ -76,4 +106,38 @@ func test() {
 	for _, v := range primes {
 		fmt.Println(v)
 	}
+}
+
+func secureHeaders(c *gin.Context) {
+	if c.Request.Host != expectedHost {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
+		return
+	}
+	c.Header("X-Frame-Options", "DENY")
+	c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
+	c.Header("X-XSS-Protection", "1; mode=block")
+	c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	c.Header("Referrer-Policy", "strict-origin")
+	c.Header("X-Content-Type-Options", "nosniff")
+	c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
+	c.Next()
+}
+
+func loadDotEnvVariables() {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
+
+func generateUULID() string {
+	id, err := uulid.New()
+	if err != nil {
+		// handle err
+	}
+	fmt.Println(id.String())
+	return id.String()
 }
