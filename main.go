@@ -14,7 +14,7 @@ import (
 const expectedHost string = "0.0.0.0:8080"
 
 func main() {
-	loadEnvVariables()
+	// loadEnvVariables()
 
 	println("**** USER_NAME ****")
 	println(os.Getenv("USER_NAME"))
