@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/brunotm/uulid"
 	"github.com/gin-gonic/gin"
@@ -13,9 +14,13 @@ import (
 const expectedHost string = "0.0.0.0:8080"
 
 func main() {
-	loadDotEnvVariables()
+	loadEnvVariables()
 
-	generateUULID()
+	println("**** USER_NAME ****")
+	println(os.Getenv("USER_NAME"))
+	println("**** *** ****")
+
+	// generateUULID()
 
 	router := gin.Default()
 
@@ -123,8 +128,7 @@ func secureHeaders(c *gin.Context) {
 	c.Next()
 }
 
-func loadDotEnvVariables() {
-
+func loadEnvVariables() {
 	// load .env file
 	err := godotenv.Load(".env")
 
