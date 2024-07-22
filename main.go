@@ -100,10 +100,13 @@ func test() {
 }
 
 func secureHeaders(c *gin.Context) {
-	if c.Request.Host != expectedHost {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
-		return
-	}
+	// incomingHost := c.Request.Host
+	// fmt.Println("Incoming Host:", incomingHost)
+	// if incomingHost != expectedHost {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
+	// 	return
+	// }
+
 	c.Header("X-Frame-Options", "DENY")
 	c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
 	c.Header("X-XSS-Protection", "1; mode=block")
