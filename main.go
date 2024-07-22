@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,7 +13,7 @@ import (
 const expectedHost string = "0.0.0.0:8080"
 
 func main() {
-	// loadEnvVariables()
+	loadEnvVariables()
 
 	println("**** USER_NAME ****")
 	println(os.Getenv("USER_NAME"))
@@ -27,21 +26,7 @@ func main() {
 	authMiddleware := AuthMiddleware()
 	router.Use((HandlerAuthMiddleWare(authMiddleware)))
 
-	// router.Use(secureHeaders)
-
-	// signedAccessToken, err := NewHadermanBackendServerAccessToken()
-	// if err != nil {
-	// 	log.Fatal("error creating access token")
-	// }
-
-	// println("token: ")
-	// println(signedAccessToken)
-
-	// parsedUserClaims := ParseAccessToken(signedAccessToken)
-	// print("claims: ")
-	// println(parsedUserClaims.First)
-
-	// --
+	router.Use(secureHeaders)
 
 	router.POST("/login", authMiddleware.LoginHandler)
 
@@ -134,7 +119,7 @@ func loadEnvVariables() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		fmt.Println("Error loading .env file")
 	}
 }
 
