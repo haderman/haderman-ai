@@ -50,6 +50,7 @@ func main() {
 		v1.GET("/albums", getAlbums)
 		v1.GET("/albums/:id", getAlbumByID)
 		v1.POST("/albums", postAlbums)
+		v1.POST("/images", generateImage)
 	}
 
 	router.Run(expectedHost)
